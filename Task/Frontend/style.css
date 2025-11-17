@@ -1,68 +1,173 @@
 body {
-    font-family: Arial, sans-serif;
-    background-color: #f4f4f4;
+    font-family: sans-serif;
+    background-color: #f4f7f6;
     margin: 0;
     padding: 20px;
-}
-
-h1 {
-    text-align: center;
-    color: #333;
-}
-
-ul {
-    list-style-type: none;
-    padding: 0;
-}
-
-li {
-    background-color: #fff;
-    margin-bottom: 10px;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-}
-
-body {
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    margin: 0;
-    padding: 0;
 }
 
 .container {
-    max-width: 500px;
-    margin: 50px auto;
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
     padding: 20px;
-    background-color: white;
     border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
-
-form {
-    display: flex;
-    flex-direction: column;
+header {
+    text-align: center;
     margin-bottom: 20px;
 }
 
-form input {
-    padding: 10px;
-    margin-bottom: 10px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
+/* --- Lista de Tarefas --- */
+
+#tarefas-list {
+    list-style: none;
+    padding: 0;
+    margin-bottom: 20px;
 }
 
-form button {
+.task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+    transition: background-color 0.3s;
+}
+
+.task-item:hover {
+    background-color: #f9f9f9;
+}
+
+.task-content {
+    flex-grow: 1;
+    margin-right: 15px;
+}
+
+.task-content strong {
+    display: block;
+    font-size: 1.1em;
+}
+
+.task-content p {
+    margin: 5px 0 0;
+    color: #555;
+    font-size: 0.9em;
+}
+
+/* Estilo para tarefa CONCLUÍDA (Texto Riscado) */
+.task-item.completed .task-content {
+    text-decoration: line-through; 
+    color: #888;
+}
+.task-item.completed {
+    opacity: 0.7;
+}
+
+/* --- Botões de Ação --- */
+
+/* ... (Mantenha o CSS anterior) ... */
+
+/* --- Botões de Ação --- */
+
+.task-actions button {
+    margin-left: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    border: none;
+    border-radius: 4px;
+    font-size: 0.85em;
+    transition: background-color 0.2s;
+    color: white; /* Cor do texto padrão para os botões */
+}
+
+/* 🟢 Estilo para Status CONCLUÍDO (Texto: Concluído) */
+.complete-btn.completed-status {
+    background-color: #4CAF50; /* Verde */
+}
+
+/* 🟡 Estilo para Status PENDENTE (Texto: Pendente) */
+.complete-btn.pending-status {
+    background-color: #FF9800; /* Laranja/Amarelo */
+}
+
+.delete-btn {
+    background-color: #f44336; /* Vermelho para Excluir */
+}
+
+/* ... (Mantenha o restante do CSS) ... */
+
+.add-btn {
+    width: 100%;
     padding: 10px;
-    background-color: #4CAF50;
+    background-color: #007bff;
     color: white;
     border: none;
     border-radius: 4px;
+    font-size: 1em;
     cursor: pointer;
+    margin-top: 20px;
 }
 
-form button:hover {
-    background-color: #45a049;
+/* --- Diálogo Modal --- */
+
+dialog {
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
 }
 
+dialog input[type="text"], dialog textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+dialog textarea {
+    resize: vertical;
+    min-height: 60px;
+}
+
+.dialog-actions {
+    margin-top: 15px;
+    text-align: right;
+}
+
+.dialog-actions button {
+    padding: 10px 15px;
+    margin-left: 10px;
+}
+
+
+
+/* 1. MUDANÇA VISUAL DA TAREFA RISCADA */
+/* Aplica o riscado no texto (strong e p) DENTRO do item com a classe 'completed' */
+.task-item.completed .task-content {
+    text-decoration: line-through; /* Isto risca o texto! */
+    color: #888;
+}
+/* Suaviza o item inteiro para mostrar que está finalizado */
+.task-item.completed {
+    opacity: 0.7;
+}
+
+/* ---------------------------------------------------- */
+
+/* 2. MUDANÇA VISUAL DO BOTÃO DE STATUS */
+
+/* Estilo para Status CONCLUÍDO (Texto: Concluído) */
+.complete-btn.completed-status {
+    background-color: #4CAF50; /* Verde */
+    color: white;
+}
+
+/* Estilo para Status PENDENTE (Texto: Pendente) */
+.complete-btn.pending-status {
+    background-color: #FF9800; /* Laranja/Amarelo */
+    color: white;
+}
