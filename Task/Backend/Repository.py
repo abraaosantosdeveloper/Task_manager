@@ -1,12 +1,11 @@
 from datetime import datetime
 import mysql.connector
-import Repository
 
 class Repository:
     
     def __init__(self):
         self.host = "localhost"
-        self.port = 3307
+        self.port = 3306
         self.database = "task_manager"
         self.user = "root"
         self.password = ""

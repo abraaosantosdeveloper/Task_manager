@@ -14,4 +14,4 @@ CREATE TABLE `tasks` (
 INSERT INTO `tasks` (`title`, `description`, `completed_at`)
 VALUES 
 ('Enviar relatório', 'Relatório mensal de vendas', '2025-11-03 15:30:00'),
-('Comprar mantimentos', 'Ir ao supermercado no sábado', '2025-11-04 10:00')
+('Comprar mantimentos', 'Ir ao supermercado no sábado', '2025-11-04 10:00');
