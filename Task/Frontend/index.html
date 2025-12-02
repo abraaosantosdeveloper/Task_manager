@@ -37,5 +37,22 @@
             </div>
         </form>
     </dialog>
+
+    <dialog id="Dialog_EditTask">
+        <form id="form-edit" onsubmit="updateTask(event)">
+            <h2>Editar Tarefa</h2>
+
+            <label>Título:</label>
+            <input id="edit-titulo" type="text" required>
+
+            <label>Descrição:</label>
+            <textarea id="edit-descricao"></textarea>
+
+            <div class="dialog-actions">
+                <button type="button" onclick="document.getElementById('Dialog_EditTask').close()">Cancelar</button>
+                <button type="submit">Salvar</button>
+            </div>
+        </form>
+    </dialog>
 </body>
 </html>

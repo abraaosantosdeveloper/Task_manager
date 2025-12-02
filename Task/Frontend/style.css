@@ -82,15 +82,14 @@ header {
     color: white; /* Cor do texto padrão para os botões */
 }
 
-/* 🟢 Estilo para Status CONCLUÍDO (Texto: Concluído) */
-.complete-btn.completed-status {
-    background-color: #4CAF50; /* Verde */
-}
+.status-pending { border-left: 4px solid orange; }
+.status-in_progress { border-left: 4px solid blue; }
+.status-completed { border-left: 4px solid green; opacity: 0.7; text-decoration: line-through; }
 
-/* 🟡 Estilo para Status PENDENTE (Texto: Pendente) */
-.complete-btn.pending-status {
-    background-color: #FF9800; /* Laranja/Amarelo */
-}
+.status-btn-pending { background: orange; }
+.status-btn-in_progress { background: blue; color: #fff; }
+.status-btn-completed { background: green; color: #fff; }
+
 
 .delete-btn {
     background-color: #f44336; /* Vermelho para Excluir */
@@ -170,4 +169,20 @@ dialog textarea {
 .complete-btn.pending-status {
     background-color: #FF9800; /* Laranja/Amarelo */
     color: white;
+}
+
+/* Botão Editar */
+.edit-btn {
+    background-color: #007bff; /* Azul */
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 0.85em;
+    transition: background-color 0.2s;
+}
+
+.edit-btn:hover {
+    background-color: #0056b3; /* Azul mais escuro ao passar o mouse */
 }

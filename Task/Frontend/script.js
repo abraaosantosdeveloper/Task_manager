@@ -1,13 +1,9 @@
 const apiUrl = "http://localhost:5000/tarefas";
 
-// FetchTasks é chamado no onload do body do HTML.
-
-// Buscar e listar tarefas
 async function fetchTasks() {
     try {
         const response = await fetch(apiUrl);
-        if (!response.ok) throw new Error(`Erro ao buscar tarefas: ${response.status}`);
-
+        if (!response.ok) throw new Error(`Erro: ${response.status}`);
         const tarefas = await response.json();
         const lista = document.getElementById('tarefas-list');
         lista.innerHTML = '';
@@ -15,134 +11,122 @@ async function fetchTasks() {
         if (tarefas.length === 0) {
             document.getElementById('mensagem-vazia').style.display = 'block';
             return;
-        } else {
-            document.getElementById('mensagem-vazia').style.display = 'none';
         }
+        document.getElementById('mensagem-vazia').style.display = 'none';
 
         tarefas.forEach(tarefa => {
-            // VERIFICAÇÃO ADAPTADA: Verifica se o campo status é 'completed'
-            const isCompleted = tarefa.status === 'completed'; 
-            
+            const status = tarefa.status || "pending";
             const item = document.createElement('li');
-            // Aplica a classe 'completed' se o status for 'completed'
-            item.className = isCompleted ? 'task-item completed' : 'task-item'; 
+            item.className = `task-item status-${status}`;
 
-            // Conteúdo da Tarefa
             const content = document.createElement('div');
             content.className = 'task-content';
-            
             const titulo = document.createElement('strong');
             titulo.textContent = tarefa.title;
-
             const descricao = document.createElement('p');
             descricao.textContent = tarefa.description || 'Sem descrição.';
-            
-            content.appendChild(titulo);
-            content.appendChild(descricao);
+            content.append(titulo, descricao);
             item.appendChild(content);
 
-            // Container para os botões
             const actionContainer = document.createElement('div');
             actionContainer.className = 'task-actions';
 
-            // 🟢 Botão Status (Concluído/Pendente)
-            const btnComplete = document.createElement('button');
-            
-            // LÓGICA DE TEXTO E CLASSE ADAPTADA:
-            btnComplete.textContent = isCompleted ? 'Concluído' : 'Pendente';
-            btnComplete.className = isCompleted ? 'complete-btn completed-status' : 'complete-btn pending-status'; 
-            
-            btnComplete.onclick = () => completeTask(tarefa.id);
+            // Botão status
+            const statusLabels = { pending: "Pendente", in_progress: "Em progresso", completed: "Concluído" };
+            const btnStatus = document.createElement('button');
+            btnStatus.textContent = statusLabels[status];
+            btnStatus.className = `status-btn status-btn-${status}`;
+            btnStatus.onclick = () => changeStatus(tarefa.id, status);
 
-            // ❌ Botão Excluir
+            // Botão editar
+            const btnEdit = document.createElement('button');
+            btnEdit.textContent = "Editar";
+            btnEdit.className = "edit-btn";
+            btnEdit.onclick = () => editTask(tarefa);
+
+            // Botão excluir
             const btnDelete = document.createElement('button');
             btnDelete.textContent = 'Excluir';
             btnDelete.className = 'delete-btn';
             btnDelete.onclick = () => deleteTask(tarefa.id);
-            
-            actionContainer.appendChild(btnComplete);
-            actionContainer.appendChild(btnDelete);
-            
+
+            actionContainer.append(btnStatus, btnEdit, btnDelete);
             item.appendChild(actionContainer);
             lista.appendChild(item);
         });
     } catch (error) {
-        console.error("Erro em fetchTasks:", error);
-        alert('Não foi possível carregar as tarefas. Verifique se o servidor está rodando em ' + apiUrl);
+        console.error(error);
+        alert("Erro ao carregar tarefas.");
     }
 }
 
 // Adicionar tarefa
 async function addTask(event) {
     event.preventDefault();
-
     const titulo = document.getElementById('titulo').value.trim();
     const descricao = document.getElementById('descricao').value.trim();
     const dialog = document.getElementById('Dialog_AddTask');
-
-    if (!titulo) {
-        alert('Título é obrigatório.');
-        return;
-    }
+    if (!titulo) return alert("Título é obrigatório.");
 
     try {
-        // Envia a requisição POST
-        const response = await fetch(apiUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title: titulo, description: descricao })
+        await fetch(apiUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: titulo, description: descricao, status: "pending" })
         });
-
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erro ao adicionar tarefa: ${response.status} - ${errorText}`);
-        }
-
-        // Limpa o formulário e fecha o diálogo em caso de sucesso
+        dialog.close();
         document.getElementById('form-tarefa').reset();
-        dialog.close(); 
-        
         fetchTasks();
-
-    } catch (error) {
-        console.error("Erro em addTask:", error);
-        alert('Não foi possível adicionar a tarefa. Detalhes: ' + error.message);
+    } catch {
+        alert("Erro ao adicionar tarefa.");
     }
 }
 
-// Concluir/Desfazer tarefa
-function completeTask(id) {
-    // Note: O endpoint /completar no backend deve saber como alternar o status
-    // Se a tarefa estiver 'completed', ele deve mudar para 'pending' (ou vice-versa).
-    fetch(`${apiUrl}/${id}/completar`, { method: "PUT" })
-      .then(res => { 
-          if (!res.ok) throw new Error(`Falha ao alterar status da tarefa. Status: ${res.status}`);
-      })
-      .then(() => { 
-          // Recarrega a lista lendo o NOVO status (completed ou pending) do BD
-          fetchTasks(); 
-      })
-      .catch(err => { 
-          console.error(err); 
-          alert(err.message || 'Não foi possível alterar o status da tarefa.');
-      });
+// Alternar status
+function changeStatus(id, currentStatus) {
+    const nextStatus = { pending: "in_progress", in_progress: "completed", completed: "pending" };
+    fetch(`${apiUrl}/${id}/status`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ status: nextStatus[currentStatus] })
+    })
+    .then(() => fetchTasks())
+    .catch(() => alert("Erro ao alterar status."));
 }
 
 // Excluir tarefa
 function deleteTask(id) {
-    if (!confirm("Tem certeza que deseja excluir esta tarefa?")) {
-        return;
-    }
-    
+    if (!confirm("Deseja excluir esta tarefa?")) return;
     fetch(`${apiUrl}/${id}`, { method: "DELETE" })
-      .then(res => { 
-          if (!res.ok) throw new Error(`Falha ao excluir a tarefa. Status: ${res.status}`);
-      })
-      .then(() => { 
-          fetchTasks(); 
-      })
-      .catch(err => { 
-          console.error(err); 
-          alert(err.message || 'Não foi possível excluir a tarefa.');
-      });
+        .then(() => fetchTasks())
+        .catch(() => alert("Erro ao excluir."));
+}
+
+// Editar tarefa
+let editTaskId = null;
+
+function editTask(tarefa) {
+    editTaskId = tarefa.id;
+    document.getElementById("edit-titulo").value = tarefa.title;
+    document.getElementById("edit-descricao").value = tarefa.description;
+    document.getElementById("Dialog_EditTask").showModal();
+}
+
+async function updateTask(event) {
+    event.preventDefault();
+    const titulo = document.getElementById("edit-titulo").value.trim();
+    const descricao = document.getElementById("edit-descricao").value.trim();
+    if (!titulo) return alert("Título obrigatório.");
+
+    try {
+        await fetch(`${apiUrl}/${editTaskId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ title: titulo, description: descricao })
+        });
+        document.getElementById("Dialog_EditTask").close();
+        fetchTasks();
+    } catch {
+        alert("Erro ao atualizar tarefa.");
+    }
 }

@@ -1,1 +1,1 @@
-python -m http.server -b 0.0.0.0 8080
+python -m http.server 8080
