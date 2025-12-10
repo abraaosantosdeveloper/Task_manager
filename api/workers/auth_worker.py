@@ -25,10 +25,12 @@ class AuthWorker:
         token = self.generate_token(user_id, email)
         
         return {
-            "user_id": user_id,
-            "email": email,
-            "name": name,
-            "token": token
+            "token": token,
+            "user": {
+                "id": user_id,
+                "email": email,
+                "name": name
+            }
         }
     
     def login(self, email, password):
@@ -46,10 +48,12 @@ class AuthWorker:
         token = self.generate_token(user['id'], user['email'])
         
         return {
-            "user_id": user['id'],
-            "email": user['email'],
-            "name": user['name'],
-            "token": token
+            "token": token,
+            "user": {
+                "id": user['id'],
+                "email": user['email'],
+                "name": user['name']
+            }
         }
     
     def generate_token(self, user_id, email):
@@ -93,3 +97,39 @@ class AuthWorker:
             raise ValueError("User not found")
         
         return user
+    
+    def update_profile(self, user_id, name, email, current_password=None, new_password=None):
+        """Update user profile"""
+        # Get current user (sem senha)
+        user = self.user_repo.find_by_id(user_id)
+        if not user:
+            raise ValueError("User not found")
+        
+        # Check if email is being changed and if it's already in use
+        if email != user['email']:
+            if self.user_repo.email_exists(email):
+                raise ValueError("Email already in use")
+        
+        # If changing password, verify current password
+        if new_password:
+            if not current_password:
+                raise ValueError("Current password is required to set a new password")
+            
+            # Get user with password for verification
+            user_with_password = self.user_repo.find_by_email(user['email'])
+            if not self.user_repo.verify_password(current_password, user_with_password['password']):
+                raise ValueError("Current password is incorrect")
+            
+            if len(new_password) < 6:
+                raise ValueError("New password must be at least 6 characters")
+        
+        # Update user
+        updated_user = self.user_repo.update_user(user_id, name, email, new_password)
+        
+        return {
+            "user": {
+                "id": updated_user['id'],
+                "name": updated_user['name'],
+                "email": updated_user['email']
+            }
+        }

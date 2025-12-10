@@ -22,3 +22,9 @@ def login():
 def me():
     """Get current user info"""
     return auth_controller.me(get_current_user())
+
+@auth_bp.route('/profile', methods=['PUT'])
+@token_required
+def update_profile():
+    """Update user profile"""
+    return auth_controller.update_profile(get_current_user())

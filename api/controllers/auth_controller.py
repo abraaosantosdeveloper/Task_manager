@@ -65,6 +65,9 @@ def login():
         
         # Login user
         result = auth_worker.login(email, password)
+        print(f"[Login] User logged in: {email}")
+        print(f"[Login] Token generated: {result['token'][:20]}...")
+        print(f"[Login] Response structure: token={bool(result.get('token'))}, user={bool(result.get('user'))}")
         
         return success_response(result, "Login successful")
         
@@ -78,11 +81,52 @@ def me(current_user):
     """Get current user info"""
     try:
         return success_response({
-            "id": current_user['id'],
-            "email": current_user['email'],
-            "name": current_user['name'],
-            "created_at": str(current_user['created_at'])
-        })
+            "user": {
+                "id": current_user['id'],
+                "email": current_user['email'],
+                "name": current_user['name'],
+                "created_at": str(current_user['created_at'])
+            }
+        }, "User info retrieved successfully")
     except Exception as e:
         print(f"Error getting user info: {e}")
         return server_error_response()
+
+def update_profile(current_user):
+    """Update user profile"""
+    try:
+        data = request.get_json()
+        user_id = current_user['id']
+        
+        # Get data
+        name = data.get('name', '').strip()
+        email = data.get('email', '').strip()
+        current_password = data.get('current_password', '').strip()
+        new_password = data.get('new_password', '').strip()
+        
+        # Validation
+        errors = {}
+        if not name:
+            errors['name'] = "Name is required"
+        if not email:
+            errors['email'] = "Email is required"
+        
+        if errors:
+            return validation_error_response(errors)
+        
+        # Update profile
+        result = auth_worker.update_profile(
+            user_id, 
+            name, 
+            email, 
+            current_password, 
+            new_password
+        )
+        
+        return success_response(result, "Profile updated successfully")
+        
+    except ValueError as e:
+        return error_response(str(e), status_code=400)
+    except Exception as e:
+        print(f"Error updating profile: {e}")
+        return server_error_response("Failed to update profile")

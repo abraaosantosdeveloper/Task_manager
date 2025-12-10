@@ -9,7 +9,7 @@ class TaskWorker:
     def __init__(self):
         self.task_repo = TaskRepository()
     
-    def create_task(self, user_id, title, description, status='pending'):
+    def create_task(self, user_id, title, status='pending'):
         """Create a new task"""
         if not title or len(title.strip()) == 0:
             raise ValueError("Title is required")
@@ -17,14 +17,11 @@ class TaskWorker:
         if status not in ['pending', 'in_progress', 'completed']:
             raise ValueError("Invalid status")
         
-        task_id = self.task_repo.create_task(user_id, title, description, status)
+        task_id = self.task_repo.create_task(user_id, title, status)
         
-        return {
-            "id": task_id,
-            "title": title,
-            "description": description,
-            "status": status
-        }
+        # Get the complete task with created_at from database
+        task = self.task_repo.find_by_id(task_id, user_id)
+        return task
     
     def get_all_tasks(self, user_id):
         """Get all tasks for a user"""
@@ -38,7 +35,7 @@ class TaskWorker:
             raise ValueError("Task not found")
         return task
     
-    def update_task(self, task_id, user_id, title, description):
+    def update_task(self, task_id, user_id, title):
         """Update a task"""
         if not title or len(title.strip()) == 0:
             raise ValueError("Title is required")
@@ -48,7 +45,7 @@ class TaskWorker:
         if not task:
             raise ValueError("Task not found")
         
-        success = self.task_repo.update_task(task_id, user_id, title, description)
+        success = self.task_repo.update_task(task_id, user_id, title)
         
         if not success:
             raise ValueError("Failed to update task")

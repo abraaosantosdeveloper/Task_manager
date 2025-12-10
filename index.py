@@ -3,20 +3,32 @@ Task Manager API - Main Entry Point for Vercel
 """
 from flask import Flask, jsonify
 from flask_cors import CORS
+from flask.json.provider import DefaultJSONProvider
 from api.routes.auth_routes import auth_bp
 from api.routes.task_routes import task_bp
 from api.utils.config import Config
 from api.utils.database import Database
+from datetime import datetime
+
+# Custom JSON provider to handle datetime serialization
+class CustomJSONProvider(DefaultJSONProvider):
+    def default(self, obj):
+        if isinstance(obj, datetime):
+            # Return datetime in MySQL format: "YYYY-MM-DD HH:MM:SS"
+            return obj.strftime('%Y-%m-%d %H:%M:%S')
+        return super().default(obj)
 
 # Create Flask app
 app = Flask(__name__)
+app.json = CustomJSONProvider(app)
 
-# CORS Configuration
+# CORS Configuration - Allow all origins
 CORS(app, 
-     origins=Config.CORS_ORIGINS,
-     supports_credentials=True,
-     allow_headers=['Content-Type', 'Authorization'],
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'])
+     resources={r"/*": {"origins": "*"}},
+     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+     expose_headers=['Content-Type', 'Authorization'],
+     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+     max_age=3600)
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
@@ -70,6 +82,16 @@ def database_health():
             "success": False,
             "message": f"Database error: {str(e)}"
         }), 500
+
+# CORS Preflight handler
+@app.after_request
+def after_request(response):
+    """Add CORS headers to all responses"""
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization,X-Requested-With,Accept,Origin')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS,PATCH')
+    response.headers.add('Access-Control-Max-Age', '3600')
+    return response
 
 # Error handlers
 @app.errorhandler(404)

@@ -10,17 +10,17 @@ class TaskRepository:
     def __init__(self):
         self.db = Database()
     
-    def create_task(self, user_id, title, description, status='pending'):
+    def create_task(self, user_id, title, status='pending'):
         """Create a new task"""
         try:
             conn = self.db.get_connection()
             cursor = conn.cursor()
             
             query = """
-                INSERT INTO tasks (user_id, title, description, status, created_at)
-                VALUES (%s, %s, %s, %s, NOW())
+                INSERT INTO tasks (user_id, title, status, created_at)
+                VALUES (%s, %s, %s, NOW())
             """
-            cursor.execute(query, (user_id, title, description, status))
+            cursor.execute(query, (user_id, title, status))
             conn.commit()
             
             task_id = cursor.lastrowid
@@ -39,7 +39,7 @@ class TaskRepository:
             cursor = conn.cursor(dictionary=True)
             
             query = """
-                SELECT id, title, description, status, created_at, completed_at
+                SELECT id, title, status, created_at, completed_at
                 FROM tasks
                 WHERE user_id = %s
                 ORDER BY created_at DESC
@@ -62,7 +62,7 @@ class TaskRepository:
             cursor = conn.cursor(dictionary=True)
             
             query = """
-                SELECT id, title, description, status, created_at, completed_at
+                SELECT id, title, status, created_at, completed_at
                 FROM tasks
                 WHERE id = %s AND user_id = %s
             """
@@ -77,7 +77,7 @@ class TaskRepository:
             print(f"Error finding task: {e}")
             raise
     
-    def update_task(self, task_id, user_id, title, description):
+    def update_task(self, task_id, user_id, title):
         """Update a task"""
         try:
             conn = self.db.get_connection()
@@ -85,10 +85,10 @@ class TaskRepository:
             
             query = """
                 UPDATE tasks
-                SET title = %s, description = %s
+                SET title = %s
                 WHERE id = %s AND user_id = %s
             """
-            cursor.execute(query, (title, description, task_id, user_id))
+            cursor.execute(query, (title, task_id, user_id))
             conn.commit()
             
             rows_affected = cursor.rowcount

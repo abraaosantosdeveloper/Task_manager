@@ -17,7 +17,7 @@ def get_all_tasks(current_user):
         user_id = current_user['id']
         tasks = task_worker.get_all_tasks(user_id)
         
-        return success_response(tasks)
+        return success_response({"tasks": tasks})
         
     except Exception as e:
         print(f"Error fetching tasks: {e}")
@@ -29,7 +29,7 @@ def get_task(task_id, current_user):
         user_id = current_user['id']
         task = task_worker.get_task(task_id, user_id)
         
-        return success_response(task)
+        return success_response({"task": task})
         
     except ValueError as e:
         return not_found_response(str(e))
@@ -45,7 +45,6 @@ def create_task(current_user):
         
         # Validation
         title = data.get('title', '').strip()
-        description = data.get('description', '').strip()
         status = data.get('status', 'pending')
         
         errors = {}
@@ -58,9 +57,9 @@ def create_task(current_user):
             return validation_error_response(errors)
         
         # Create task
-        result = task_worker.create_task(user_id, title, description, status)
+        result = task_worker.create_task(user_id, title, status)
         
-        return created_response(result, "Task created successfully")
+        return created_response({"task": result}, "Task created successfully")
         
     except ValueError as e:
         return error_response(str(e))
@@ -76,7 +75,6 @@ def update_task(task_id, current_user):
         
         # Validation
         title = data.get('title', '').strip()
-        description = data.get('description', '').strip()
         
         errors = {}
         if not title:
@@ -86,9 +84,9 @@ def update_task(task_id, current_user):
             return validation_error_response(errors)
         
         # Update task
-        result = task_worker.update_task(task_id, user_id, title, description)
+        result = task_worker.update_task(task_id, user_id, title)
         
-        return success_response(result, "Task updated successfully")
+        return success_response({"task": result}, "Task updated successfully")
         
     except ValueError as e:
         return not_found_response(str(e))
@@ -111,7 +109,7 @@ def update_task_status(task_id, current_user):
         # Update status
         result = task_worker.update_status(task_id, user_id, status)
         
-        return success_response(result, "Status updated successfully")
+        return success_response({"task": result}, "Status updated successfully")
         
     except ValueError as e:
         return not_found_response(str(e))
@@ -141,7 +139,7 @@ def get_statistics(current_user):
         user_id = current_user['id']
         stats = task_worker.get_statistics(user_id)
         
-        return success_response(stats)
+        return success_response({"statistics": stats})
         
     except Exception as e:
         print(f"Error fetching statistics: {e}")

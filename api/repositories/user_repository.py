@@ -86,3 +86,40 @@ class UserRepository:
         """Check if email already exists"""
         user = self.find_by_email(email)
         return user is not None
+    
+    def update_user(self, user_id, name, email, new_password=None):
+        """Update user information"""
+        try:
+            conn = self.db.get_connection()
+            cursor = conn.cursor(dictionary=True)
+            
+            if new_password:
+                # Hash new password
+                hashed_password = bcrypt.hashpw(new_password.encode('utf-8'), bcrypt.gensalt())
+                query = """
+                    UPDATE users 
+                    SET name = %s, email = %s, password = %s
+                    WHERE id = %s
+                """
+                cursor.execute(query, (name, email, hashed_password, user_id))
+            else:
+                query = """
+                    UPDATE users 
+                    SET name = %s, email = %s
+                    WHERE id = %s
+                """
+                cursor.execute(query, (name, email, user_id))
+            
+            conn.commit()
+            
+            # Get updated user
+            cursor.execute("SELECT id, email, name, created_at FROM users WHERE id = %s", (user_id,))
+            updated_user = cursor.fetchone()
+            
+            cursor.close()
+            conn.close()
+            
+            return updated_user
+        except Exception as e:
+            print(f"Error updating user: {e}")
+            raise

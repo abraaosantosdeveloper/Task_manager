@@ -17,7 +17,6 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     `id` INT AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT NOT NULL,
     `title` VARCHAR(200) NOT NULL,
-    `description` TEXT,
     `status` ENUM('pending', 'in_progress', 'completed') DEFAULT 'pending',
     `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     `completed_at` DATETIME NULL,
