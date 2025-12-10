@@ -1,0 +1,14 @@
+# Task Manager Backend - Python Dependencies
+
+# Web Framework
+Flask==3.0.0
+Flask-CORS==4.0.0
+
+# Database
+mysql-connector-python==8.2.0
+
+# Development Tools
+python-dotenv==1.0.0
+
+# Optional but recommended
+Werkzeug==3.0.1
