@@ -6,6 +6,7 @@ from flask_cors import CORS
 from flask.json.provider import DefaultJSONProvider
 from api.routes.auth_routes import auth_bp
 from api.routes.task_routes import task_bp
+from api.routes.keep_alive_routes import keep_alive_bp
 from api.utils.config import Config
 from api.utils.database import Database
 from datetime import datetime
@@ -33,6 +34,7 @@ CORS(app,
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
 app.register_blueprint(task_bp, url_prefix='/api/tasks')
+app.register_blueprint(keep_alive_bp, url_prefix='/api/keep-alive')
 
 # Health check endpoint
 @app.route('/')

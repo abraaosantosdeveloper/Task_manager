@@ -26,6 +26,18 @@ CREATE TABLE IF NOT EXISTS `tasks` (
     INDEX idx_created_at (`created_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+-- Dummy table for keep-alive (prevents database sleep)
+CREATE TABLE IF NOT EXISTS `dummy_data` (
+    `id` INT AUTO_INCREMENT PRIMARY KEY,
+    `is_active` BOOLEAN NOT NULL DEFAULT TRUE,
+    `last_ping` TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    `description` VARCHAR(255) DEFAULT 'Keep-alive ping data'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Insert initial dummy record
+INSERT INTO `dummy_data` (`is_active`, `description`) 
+VALUES (TRUE, 'Database keep-alive record');
+
 -- Sample data (optional - for testing)
 -- Note: Password is 'password123' hashed with bcrypt
 -- INSERT INTO `users` (`email`, `password`, `name`)
