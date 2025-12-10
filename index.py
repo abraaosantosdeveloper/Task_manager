@@ -25,11 +25,14 @@ app.json = CustomJSONProvider(app)
 
 # CORS Configuration - Allow all origins
 CORS(app, 
-     resources={r"/*": {"origins": "*"}},
-     allow_headers=['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
-     expose_headers=['Content-Type', 'Authorization'],
-     methods=['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
-     max_age=3600)
+     resources={r"/*": {
+         "origins": "*",
+         "allow_headers": ['Content-Type', 'Authorization', 'X-Requested-With', 'Accept', 'Origin'],
+         "expose_headers": ['Content-Type', 'Authorization'],
+         "methods": ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+         "max_age": 3600,
+         "supports_credentials": False
+     }})
 
 # Register blueprints
 app.register_blueprint(auth_bp, url_prefix='/api/auth')
